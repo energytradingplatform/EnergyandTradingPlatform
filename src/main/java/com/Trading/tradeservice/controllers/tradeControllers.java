@@ -1,14 +1,12 @@
 package com.Trading.tradeservice.controllers;
 
 import com.Trading.tradeservice.dtos.Request.TradeRequest;
+import com.Trading.tradeservice.dtos.Request.UpdateTradeRequest;
 import com.Trading.tradeservice.dtos.Response.TradeResponse;
 import com.Trading.tradeservice.services.TradeService;
 import com.Trading.tradeservice.validation.TradeValidator;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class tradeControllers {
@@ -32,6 +30,15 @@ public class tradeControllers {
         return ResponseEntity.ok(new TradeResponse());
 
         // Implementation for creating a trade
+    }
+
+    @PostMapping("/tradeId")
+    public ResponseEntity<TradeResponse> updateTrade(
+            @PathVariable String tradeId,
+            @RequestBody UpdateTradeRequest request){
+
+
+            tradeService.updateTrade(tradeId, request);
     }
 
 

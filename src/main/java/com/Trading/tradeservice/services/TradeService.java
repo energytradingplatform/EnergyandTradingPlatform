@@ -3,8 +3,10 @@ package com.Trading.tradeservice.services;
 import com.Trading.tradeservice.Exceptions.IdempotencyException;
 import com.Trading.tradeservice.Exceptions.TradeValidationException;
 import com.Trading.tradeservice.dtos.Request.TradeRequest;
+import com.Trading.tradeservice.dtos.Request.UpdateTradeRequest;
 import com.Trading.tradeservice.dtos.Response.TradeResponse;
 import com.Trading.tradeservice.models.IdempotencyKey;
+import com.Trading.tradeservice.models.IdempotencyStatus;
 import com.Trading.tradeservice.models.Trade;
 import com.Trading.tradeservice.models.TradeType;
 import com.Trading.tradeservice.respositories.*;
@@ -32,7 +34,7 @@ public class TradeService {
         }
 
         @Transactional
-        public TradeResponse captureTrade(String idempotencyKey, TradeRequest tradeRequest) {
+        public String captureTrade(String idempotencyKey, TradeRequest tradeRequest) {
             // Implementation for creating a trade
 
 
@@ -41,25 +43,38 @@ public class TradeService {
             Optional<IdempotencyKey> existing =  idempotencyKeyRepository.findByIdempotencyKey(idempotencyKey);
 
             if(existing.isPresent()){
+                if(!(existing.get().getRequestHash().equals(calculateHash(tradeRequest)))){
+                    throw new IdempotencyException("Trade with this idempotency key already exists. Trade ID: " +existing.get().getIdempotencyKey()+" but different request");
 
-               throw new IdempotencyException("Trade with this idempotency key already exists. Trade ID: " +existing.get().getIdempotencyKey());
+                }
+                String tradereturned = existing.get().getResponseBody();
+               return tradereturned;
             }
 
             // Additional logic for capturing the trade
             Trade trade =   mapToEntity(tradeRequest);
+
             Trade savedTrade =  tradeRepository.save(trade);
 
             IdempotencyKey newIdempotencyKey = new IdempotencyKey();
-            newIdempotencyKey.setId(idempotencyKey);
+            newIdempotencyKey.setIdempotencyKey(idempotencyKey);
             newIdempotencyKey.setTradeId(savedTrade.getId());
+            newIdempotencyKey.setStatusCode(IdempotencyStatus.COMPLETED);
             newIdempotencyKey.setRequestHash(calculateHash(tradeRequest));
-            newIdempotencyKey.setResponseBody(String.valueOf(mapToResponse(savedTrade)));
+            newIdempotencyKey.setResponseBody(String.valueOf(savedTrade));
             newIdempotencyKey.setCreatedAt(LocalDateTime.now());
+
 
 
             idempotencyKeyRepository.save(newIdempotencyKey);
 
-            return mapToResponse(savedTrade);
+            return String.valueOf(mapToResponse(savedTrade));
+        }
+
+
+        public String updateTrade(String tradeId, UpdateTradeRequest updateRequest){
+
+
         }
 
         private String calculateHash(TradeRequest tradeRequest) {
@@ -79,7 +94,6 @@ public class TradeService {
             trade.setLocation(request.getLocation());
             trade.setTradeDate(request.getTradeDate());
             return trade;
-
         }
 
         private TradeResponse mapToResponse(Trade trade) {

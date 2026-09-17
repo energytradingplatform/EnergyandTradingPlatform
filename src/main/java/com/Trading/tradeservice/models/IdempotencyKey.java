@@ -1,5 +1,6 @@
 package com.Trading.tradeservice.models;
 
+import com.Trading.tradeservice.dtos.Response.TradeResponse;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.context.annotation.Configuration;
@@ -20,9 +21,9 @@ public class IdempotencyKey {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
-    @Column(name="idempotencyKey", nullable = false)
+    @Column(name="idempotencyKey", nullable = false, unique = true)
     private String idempotencyKey;
 
     @Column(name="request_hash", nullable = false)
@@ -34,8 +35,9 @@ public class IdempotencyKey {
     @Column(name = "response_body", columnDefinition = "TEXT")
     private String responseBody;
 
-    @Column(name = "status_code")
-    private Integer statusCode;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private IdempotencyStatus statusCode;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
