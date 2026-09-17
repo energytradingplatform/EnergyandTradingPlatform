@@ -7,6 +7,7 @@ import com.Trading.tradeservice.validation.TradeValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,10 +23,12 @@ public class tradeControllers {
     }
 
     @PostMapping("/api/v1/trades")
-    public ResponseEntity<TradeResponse> createTrade(@RequestBody TradeRequest tradeRequest) {
+    public ResponseEntity<TradeResponse> createTrade(
+            @RequestHeader("IdempotencyKey") String idempotencyKey,
+            @RequestBody TradeRequest tradeRequest) {
 
 
-        tradeService.captureTrade(tradeRequest);
+        tradeService.captureTrade(idempotencyKey, tradeRequest);
         return ResponseEntity.ok(new TradeResponse());
 
         // Implementation for creating a trade

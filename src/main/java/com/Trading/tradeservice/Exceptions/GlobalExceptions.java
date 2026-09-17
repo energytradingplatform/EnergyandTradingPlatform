@@ -15,5 +15,11 @@ public class GlobalExceptions {
                 new ErrorResponse( "Trade_Validation_Failed", e.getMessage())
                 );
     }
+    @ExceptionHandler(IdempotencyException.class)
+    public ResponseEntity<ErrorResponse> handleIdempotencyException(IdempotencyException e) {
+        return ResponseEntity.badRequest().body(
+                new ErrorResponse("Idempotency_Failed", e.getMessage())
+        );
+    }
 
 }

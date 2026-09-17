@@ -31,14 +31,21 @@ public class TradeValidator {
         this.locationRepository = locationRepository;
     }
 
-    public void validate(TradeRequest trade) {
+    public void validate(String idempotencyKey, TradeRequest trade) {
 
+        validateIdempotencyKey(idempotencyKey);
         validateCurrency(trade.getCurrency());
         validateCommodity(trade.getCommodity());
         validateCounterparty(trade.getCounterparty_id());
         validateLocation(trade.getLocation());
         validateTradeDate(trade.getTradeDate());
         validateTradeType(trade.getTrade_type());
+    }
+
+    private void validateIdempotencyKey(String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
+            throw new TradeValidationException("Idempotency key header is required");
+        }
     }
 
     private void validateCurrency(String currency) {
