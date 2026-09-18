@@ -25,10 +25,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-
-
       - name: Build JAR
-        run: ./mvnw package -DskipTests
+        run: mvn package -DskipTests
 
       - name: Build Docker image
         run: docker build -t tradeservice:ci .
