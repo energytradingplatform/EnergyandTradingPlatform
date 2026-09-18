@@ -2,11 +2,14 @@ package com.Trading.tradeservice.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+@Setter
+@Getter
 @Entity
 @Table(name="Trade")
 public class Trade {
@@ -31,9 +34,7 @@ public class Trade {
     @Column(name = "version", nullable = false)
     private Long version;
 
-
     private LocalDate tradeDate;
     private LocalDateTime updated_at;
-
 
 }

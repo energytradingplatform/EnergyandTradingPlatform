@@ -40,6 +40,8 @@ public class TradeRequest {
     private LocalDate TradeDate;
 
 
+    private Long Version;
+
 
 
 

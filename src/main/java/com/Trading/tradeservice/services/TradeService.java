@@ -1,6 +1,8 @@
 package com.Trading.tradeservice.services;
 
 import com.Trading.tradeservice.Exceptions.IdempotencyException;
+import com.Trading.tradeservice.Exceptions.TradeConflictException;
+import com.Trading.tradeservice.Exceptions.TradeNotFoundException;
 import com.Trading.tradeservice.Exceptions.TradeValidationException;
 import com.Trading.tradeservice.dtos.Request.TradeRequest;
 import com.Trading.tradeservice.dtos.Request.UpdateTradeRequest;
@@ -72,9 +74,23 @@ public class TradeService {
         }
 
 
-        public String updateTrade(String tradeId, UpdateTradeRequest updateRequest){
+        public String updateTrade(Long tradeId, TradeRequest updateRequest){
 
+            Optional<Trade> trade =  tradeRepository.findById(tradeId);
+            if(trade  == null){
+                throw new TradeNotFoundException("Trade not found");
+            }
 
+            if (! trade.get().getVersion().equals(updateRequest.getVersion())) {
+                throw new TradeConflictException(
+                        "Trade was modified by another user");
+            }
+
+            Trade updatedTrade =   mapToEntity(updateRequest);
+
+            Trade savedTrade =  tradeRepository.save(updatedTrade);
+
+                return "";
         }
 
         private String calculateHash(TradeRequest tradeRequest) {

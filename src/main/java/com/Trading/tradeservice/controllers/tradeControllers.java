@@ -32,13 +32,17 @@ public class tradeControllers {
         // Implementation for creating a trade
     }
 
-    @PostMapping("/tradeId")
+    @PutMapping("/tradeId")
     public ResponseEntity<TradeResponse> updateTrade(
-            @PathVariable String tradeId,
-            @RequestBody UpdateTradeRequest request){
+            @PathVariable Long tradeId,
+            @RequestBody TradeRequest request){
 
 
-            tradeService.updateTrade(tradeId, request);
+           String result =  tradeService.updateTrade(tradeId, request);
+
+        return ResponseEntity.ok(
+                new TradeResponse()
+        );
     }
 
 

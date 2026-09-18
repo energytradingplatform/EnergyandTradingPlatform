@@ -1,6 +1,7 @@
 package com.Trading.tradeservice.Exceptions;
 
 import com.Trading.tradeservice.dtos.Response.ErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,4 +24,21 @@ public class GlobalExceptions {
         );
     }
 
+    @ExceptionHandler(TradeNotFoundException.class)
+    public ResponseEntity<String> tradeNotFound(TradeNotFoundException e){
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @ExceptionHandler(TradeConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
+            TradeConflictException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                        "TRADE_CONCURRENT_MODIFICATION",
+                        ex.getMessage()
+                ));
+    }
 }
