@@ -45,7 +45,7 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
-      # Login to ECR
+
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
 
