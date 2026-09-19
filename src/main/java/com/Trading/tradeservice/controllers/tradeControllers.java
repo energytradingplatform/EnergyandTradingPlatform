@@ -8,8 +8,13 @@ import com.Trading.tradeservice.validation.TradeValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @RestController
 public class tradeControllers {
+    private static final Logger log = LoggerFactory.getLogger(tradeControllers.class);
 
     private TradeService tradeService;
     private TradeValidator tradeValidator;
@@ -25,6 +30,10 @@ public class tradeControllers {
             @RequestHeader("IdempotencyKey") String idempotencyKey,
             @RequestBody TradeRequest tradeRequest) {
 
+        log.info("Creating trade, counterparty={}, product={}, quantity={}",
+                tradeRequest.getTradeDate(),
+                tradeRequest.getCommodity(),
+                tradeRequest.getCounterparty_id());
 
         tradeService.captureTrade(idempotencyKey, tradeRequest);
         return ResponseEntity.ok(new TradeResponse());
