@@ -8,7 +8,10 @@ on:
   pull_request:
     branches:
       - main
-
+# Required for GitHub OIDC
+permissions:
+      id-token: write
+      contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,5 +34,27 @@ jobs:
       - name: Build JAR
         run: mvn package -DskipTests
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            role-to-assume: arn:aws:iam::203733861374:role/GitHubActionsECRRole
+            aws-region: ap-south-1
+
+
+      # Verify that GitHub successfully assumed the IAM role
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      # Login to ECR
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+
       - name: Build Docker image
         run: docker build -t tradeservice:ci .
+
+      - name: Tag Docker image
+        run:  docker tag tradeservice:ci 203733861374.dkr.ecr.us-east-1.amazonaws.com/trade:latest
+
+      - name: Push Docker image
+        run: docker push 203733861374.dkr.ecr.us-east-1.amazonaws.com/trade:latest
