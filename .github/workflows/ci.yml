@@ -38,7 +38,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
             role-to-assume: arn:aws:iam::203733861374:role/GitHubActionsECRRole
-            aws-region: ap-south-1
+            aws-region: us-east-1
 
 
       # Verify that GitHub successfully assumed the IAM role
